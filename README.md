@@ -1,81 +1,83 @@
-# GitHub Terraform Plan Formatter
+# GitHub HCP Terraform Plan Formatter
 
-GitHubのPRページで表示されるHCP Terraform（旧Terraform Cloud）の実行結果を整形し、シンプルで読みやすい形式で表示するChrome/Edge拡張機能です。
+A Chrome/Edge extension that formats HCP Terraform (formerly Terraform Cloud) results on GitHub Pull Request pages, making them cleaner and more readable.
 
-## 機能
+## ✨ Features
 
-### 1. HCP Terraformプレフィックス削除
-長い組織名・プロジェクト名を自動削除:
+### 🔧 Clean Organization Prefixes
+Automatically removes long organization/project prefixes:
 ```
-変更前: Terraform Cloud/<ORG_NAME>/<WORKSPACE_NAME>
-変更後: <WORKSPACE_NAME>
+Before: Terraform Cloud/my-org-name/my-workspace-name
+After:  my-workspace-name
 ```
 
-### 2. プラン結果のカラー表示
-Terraformプランの結果を2行レイアウトで見やすく表示し、数値に応じたカラー表示:
+### 🎨 Color-Coded Plan Results
+Displays Terraform plan results in a clean 2-line layout with visual highlights:
 
 ```
-<WORKSPACE_NAME>
+my-workspace-name
 Terraform plan: 1 to add, 0 to change, 1 to destroy
 ```
 
-- **Add（追加）**: 青色表示、0以外の場合は太字
-- **Change（変更）**: オレンジ色表示、0以外の場合は太字  
-- **Destroy（削除）**: 赤色表示、0以外の場合は太字
-- **0の数値**: 通常フォント、背景色なし
+- **Add**: Blue color with underline for non-zero values
+- **Change**: Orange color with underline for non-zero values  
+- **Destroy**: Red color with underline for non-zero values
+- **Zero values**: Default styling
 
-### 3. 自動動作
-- GitHubのPRページで自動的に動作
-- ページ遷移、動的コンテンツ読み込みにも対応
-- Chrome、Edge両方で動作
+### ⚡ Automatic Operation
+- Works automatically on GitHub PR pages
+- Supports page navigation and dynamic content loading
+- Compatible with both Chrome and Edge browsers
+- Works with GitHub Enterprise (EMU) environments
 
-## インストール方法
+## 🚀 Installation
 
-### 開発者モードでインストール
+### Developer Mode Installation
 
-1. Chromeまたはエッジを開く
-2. アドレスバーに以下を入力：
+1. Open Chrome or Edge browser
+2. Navigate to extensions page:
    - Chrome: `chrome://extensions/`
    - Edge: `edge://extensions/`
-3. 「デベロッパーモード」を有効にする
-4. 「パッケージ化されていない拡張機能を読み込む」をクリック
-5. このフォルダーを選択
+3. Enable "Developer mode"
+4. Click "Load unpacked" (Chrome) or "Load unpacked extension" (Edge)
+5. Select this folder
 
-## ファイル構成
+## 📁 File Structure
 
 ```
 .
-├── manifest.json    # 拡張機能の設定（Manifest V3）
-├── content.js       # メインスクリプト（IIFE形式、無限ループ対策済み）
-├── style.css        # カラー表示用スタイルシート
-├── README.md        # このファイル
-└── CLAUDE.md        # 開発情報
+├── manifest.json    # Extension configuration (Manifest V3)
+├── content.js       # Main script with DOM manipulation
+├── style.css        # Styling for color-coded results
+├── README.md        # This file
+└── CLAUDE.md        # Development documentation
 ```
 
-## 技術仕様
+## 🔧 Technical Specifications
 
-- **Manifest Version**: 3
-- **権限**: `activeTab`, `*://github.com/*`
-- **実行タイミング**: `document_idle`
-- **対応イベント**: turbo:load（GitHub SPA対応）、MutationObserver
-- **重複処理防止**: data-terraform-formatted属性によるマーキング
+- **Manifest Version**: 3 (latest Chrome extension standard)
+- **Permissions**: `activeTab`, `*://github.com/*`
+- **Execution**: `document_idle` for optimal performance
+- **Compatibility**: GitHub SPA navigation, MutationObserver
+- **Duplicate Prevention**: `data-terraform-formatted` attribute marking
 
-## 動作確認
+## ✅ Testing
 
-1. 拡張機能をインストール後、GitHubのPRページにアクセス
-2. HCP Terraformのチェック結果が表示されているPRで動作確認
-3. F12でコンソールを開き、処理ログを確認可能
-4. 結果が簡潔な形式で表示されることを確認
+1. Install the extension using the steps above
+2. Navigate to a GitHub PR page with HCP Terraform results
+3. Verify that long organization prefixes are removed
+4. Check that plan results show in clean 2-line format with colors
+5. Test navigation between different PR pages
 
-## 対象ページ
+## 🎯 Target Pages
 
-- `https://github.com/*/pull/*` パターンのPRページ
-- HCP Terraform（旧Terraform Cloud）のチェック結果が表示されているページ
+- GitHub Pull Request pages: `https://github.com/*/pull/*`
+- Pages with HCP Terraform (formerly Terraform Cloud) check results
+- Compatible with GitHub Enterprise environments
 
-## 開発履歴
+## 📝 Version History
 
-- v1.0.0: 基本機能実装
-- プレフィックス削除機能追加
-- 無限ループ対策実装
-- GitHub-web-cosmetic拡張機能のアプローチを参考に安定化
-- カラー表示機能追加（数値別の色分けと強調表示）
+- **v1.0.0**: Initial release with core formatting features
+- Prefix removal for cleaner workspace names
+- Color-coded plan results with visual highlighting
+- Robust SPA navigation support
