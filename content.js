@@ -21,37 +21,68 @@
         if (el.dataset.terraformFormatted === 'true' || el.classList.contains('terraform-plan-result')) {
           return;
         }
-        
+
         // Skip if this element contains a terraform-plan-result (already processed by a child)
         if (el.querySelector('.terraform-plan-result')) {
           return;
         }
 
-        if (el.textContent && (el.textContent.includes('Terraform plan:') || el.textContent.includes('Terraform Cloud/'))) {
+        // Skip if parent element already has terraform-plan-result
+        if (el.closest('.terraform-plan-result')) {
+          return;
+        }
+
+        // Only process elements that contain both workspace name and plan
+        if (el.textContent && el.textContent.includes('Terraform Cloud/') && el.textContent.includes('Terraform plan:')) {
           let text = el.textContent;
           const originalHTML = el.innerHTML;
 
           // Extract workspace name more carefully
           let workspaceDisplayName = '';
 
-          // Debug: log the original text
-          console.log('Debug - Original text:', text);
+          // First try to extract from HTML if it contains a link
+          if (originalHTML.includes('Terraform Cloud/')) {
+            // Try to extract from span elements or link text
+            const spanMatch = originalHTML.match(/<span[^>]*>Terraform Cloud\/([^/]+)\/([^<]+)<\/span>/);
+            const linkTextMatch = originalHTML.match(/Terraform Cloud\/([^/]+)\/([^<>"'\s,]+)/);
 
-          // Try multiple patterns to extract workspace name
-          const patterns = [
-            /Terraform Cloud\/([^/]+)\/(.+?)(?:\s+[-—]\s*Terraform plan:|Terraform plan:)/,
-            /Terraform Cloud\/([^/]+)\/([^\s\-—]+)/,
-            /Terraform Cloud\/[^/]+\/(.+?)(?=\s+[-—]|\s*$)/
-          ];
+            if (spanMatch && spanMatch[2]) {
+              workspaceDisplayName = spanMatch[2].trim();
+              console.log('Debug - Extracted from span:', workspaceDisplayName);
+            } else if (linkTextMatch && linkTextMatch[2]) {
+              workspaceDisplayName = linkTextMatch[2].trim();
+              console.log('Debug - Extracted from link text:', workspaceDisplayName);
+            }
+          }
 
-          for (const pattern of patterns) {
-            const match = text.match(pattern);
-            if (match) {
-              workspaceDisplayName = match[2] ? match[2].trim() : match[1].trim();
-              // Remove any trailing separators
-              workspaceDisplayName = workspaceDisplayName.replace(/[-—\s]+$/, '');
-              console.log('Debug - Extracted workspace name:', workspaceDisplayName);
-              break;
+          // If not found in HTML, try text patterns
+          if (!workspaceDisplayName) {
+            // Debug: log the original text
+            console.log('Debug - Original text:', text);
+
+            // Try multiple patterns to extract workspace name
+            const patterns = [
+              /Terraform Cloud\/([^/]+)\/([^/\s\-—\r\n]+)/,  // More precise pattern to avoid separators
+              /Terraform Cloud\/([^/]+)\/(.+?)(?=\s*[-—]|\s*Terraform plan:|\s*$)/,
+              /Terraform Cloud\/[^/]+\/([^/\s\-—\r\n]+)/
+            ];
+
+            for (const pattern of patterns) {
+              const match = text.match(pattern);
+              if (match) {
+                // Use the last capture group that contains the workspace name
+                workspaceDisplayName = (match[2] || match[1]).trim();
+                // Additional cleanup: remove any trailing separators or whitespace
+                workspaceDisplayName = workspaceDisplayName.replace(/[-—\s]+$/, '').trim();
+
+                // Validate that the workspace name is not empty or just separators
+                if (workspaceDisplayName && !/^[-—\s]*$/.test(workspaceDisplayName)) {
+                  console.log('Debug - Extracted workspace name:', workspaceDisplayName);
+                  break;
+                } else {
+                  workspaceDisplayName = '';
+                }
+              }
             }
           }
 
@@ -68,10 +99,24 @@
               }
             }
           }
-          
-          // Final check: make sure workspace name is not just a separator
-          if (workspaceDisplayName && /^[-—\s]*$/.test(workspaceDisplayName)) {
+
+          // Final check: make sure workspace name is not just a separator or invalid
+          if (workspaceDisplayName && (/^[-—\s]*$/.test(workspaceDisplayName) || workspaceDisplayName === '—')) {
             workspaceDisplayName = '';
+            console.log('Debug - Rejected invalid workspace name');
+          }
+
+          // If we still don't have a valid workspace name, try to extract from title attribute
+          if (!workspaceDisplayName && originalHTML.includes('title=')) {
+            const titleMatch = originalHTML.match(/title="([^"]*Terraform Cloud\/[^/]+\/[^"]*?)"/);
+            if (titleMatch) {
+              const titleContent = titleMatch[1];
+              const titleWorkspaceMatch = titleContent.match(/Terraform Cloud\/[^/]+\/([^\s]+)/);
+              if (titleWorkspaceMatch && titleWorkspaceMatch[1]) {
+                workspaceDisplayName = titleWorkspaceMatch[1].trim();
+                console.log('Debug - Extracted from title:', workspaceDisplayName);
+              }
+            }
           }
 
           // Replace the full Terraform Cloud path with just the workspace name
