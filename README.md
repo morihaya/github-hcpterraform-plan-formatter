@@ -20,7 +20,7 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 ```
 
 - **Add**: Blue color with underline for non-zero values
-- **Change**: Orange color with underline for non-zero values  
+- **Change**: Orange color with underline for non-zero values
 - **Destroy**: Red color with underline for non-zero values
 - **Zero values**: Default styling
 
@@ -29,6 +29,12 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 - Supports page navigation and dynamic content loading
 - Compatible with both Chrome and Edge browsers
 - Works with GitHub Enterprise (EMU) environments
+
+### 🔔 Activity Badge
+- Shows processing count on extension icon
+- Green badge indicates successful operation
+- Tooltip displays detailed information
+- Auto-clears on page navigation
 
 ## 🚀 Installation
 
@@ -48,6 +54,7 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 .
 ├── manifest.json    # Extension configuration (Manifest V3)
 ├── content.js       # Main script with DOM manipulation
+├── background.js    # Service worker for badge management
 ├── style.css        # Styling for color-coded results
 ├── README.md        # This file
 └── CLAUDE.md        # Development documentation
@@ -56,7 +63,8 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 ## 🔧 Technical Specifications
 
 - **Manifest Version**: 3 (latest Chrome extension standard)
-- **Permissions**: `activeTab`, `*://github.com/*`
+- **Permissions**: `activeTab`, `tabs`, `*://github.com/*`
+- **Service Worker**: Background script for badge management
 - **Execution**: `document_idle` for optimal performance
 - **Compatibility**: GitHub SPA navigation, MutationObserver
 - **Duplicate Prevention**: `data-terraform-formatted` attribute marking
@@ -67,7 +75,8 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 2. Navigate to a GitHub PR page with HCP Terraform results
 3. Verify that long organization prefixes are removed
 4. Check that plan results show in clean 2-line format with colors
-5. Test navigation between different PR pages
+5. Confirm that extension badge shows processing count
+6. Test navigation between different PR pages
 
 ## 🎯 Target Pages
 
@@ -81,6 +90,7 @@ Special thanks to [github-web-cosmetic](https://github.com/officel/github-web-co
 
 ## 📝 Version History
 
+- **v1.0.1**: Badge feature update with activity indicator
 - **v1.0.0**: Initial release with core formatting features
 - Prefix removal for cleaner workspace names
 - Color-coded plan results with visual highlighting
