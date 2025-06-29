@@ -26,9 +26,9 @@
         
         if (el.textContent && (el.textContent.includes('Terraform plan:') || el.textContent.includes('Terraform Cloud/'))) {
           let text = el.textContent;
+          const originalHTML = el.innerHTML;
           
           // 1. "Terraform Cloud/PROJECT/" プレフィックスを削除
-          const originalText = text;
           text = text.replace(/Terraform Cloud\/[^/]+\//, '');
           
           // 2. Terraform planの数値を簡潔にフォーマット
@@ -37,43 +37,102 @@
           if (planMatch) {
             const [, add, change, destroy] = planMatch;
             
-            // 元のHTML構造を保持してWorkspace名のリンクを抽出
-            const originalHTML = el.innerHTML;
-            
-            // Workspace名を抽出（Terraform planより前の部分）
-            const workspacePart = text.substring(0, text.indexOf('Terraform plan:')).trim();
-            const workspaceName = workspacePart.replace(/[—\-\s]+$/, '').trim(); // 末尾の記号を削除
-            
-            // リンク部分を保持（aタグがある場合）
-            let workspaceHTML = workspaceName;
-            if (originalHTML.includes('<a ') && workspaceName) {
-              // 既存のリンクタグを探して保持
-              const linkMatch = originalHTML.match(/<a[^>]*>([^<]*)<\/a>/);
-              if (linkMatch && linkMatch[1].includes(workspaceName.split(' ')[0])) {
-                workspaceHTML = linkMatch[0];
+            // リンクがある場合は、より慎重にHTMLを操作
+            if (originalHTML.includes('<a ') && originalHTML.includes('href=')) {
+              console.log('🔗 Link detected, using HTML replacement approach');
+              
+              // カラー表示用のHTML要素を作成（2行レイアウト）
+              const createColoredCount = (count, type) => {
+                const num = parseInt(count);
+                const highlightClass = num > 0 ? ' highlight' : '';
+                return `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
+              };
+              
+              const coloredAdd = createColoredCount(add, 'add');
+              const coloredChange = createColoredCount(change, 'change');
+              const coloredDestroy = createColoredCount(destroy, 'destroy');
+              
+              // より確実な方法でリンクを保持して2行表示を実現
+              console.log('🔧 Original HTML before processing:', originalHTML);
+              
+              // より複雑なHTML構造に対応したリンク抽出
+              const linkMatch = originalHTML.match(/<a[^>]*href="[^"]*"[^>]*>.*?<\/a>/s);
+              let workspaceLink = '';
+              
+              if (linkMatch) {
+                console.log('🔗 Raw link match:', linkMatch[0]);
+                
+                // リンク内のテキストを抽出（spanタグを含む場合も対応）
+                const linkInnerMatch = linkMatch[0].match(/>([^<]+)</);
+                if (linkInnerMatch) {
+                  let linkText = linkInnerMatch[1];
+                } else {
+                  // spanタグ内のテキストを抽出
+                  const spanMatch = linkMatch[0].match(/<span[^>]*>([^<]+)<\/span>/);
+                  if (spanMatch) {
+                    let linkText = spanMatch[1];
+                  }
+                }
+                
+                // title属性からワークスペース名を正確に抽出（ユーザー提案の方法）
+                const titleMatch = linkMatch[0].match(/title="([^"]*)"/);
+                const hrefMatch = linkMatch[0].match(/href="([^"]*)"/);
+                
+                if (titleMatch && hrefMatch) {
+                  const titleContent = titleMatch[1];
+                  console.log('🔍 Title content:', titleContent);
+                  
+                  // title属性から "Terraform Cloud/ORG/" プレフィックスを削除してワークスペース名を取得
+                  const workspaceMatch = titleContent.match(/Terraform Cloud\/[^/]+\/(.+?)\s+Terraform plan:/);
+                  if (workspaceMatch) {
+                    const cleanWorkspace = workspaceMatch[1].trim();
+                    workspaceLink = `<a href="${hrefMatch[1]}" target="_blank">${cleanWorkspace}</a>`;
+                    console.log('🔗 Extracted workspace from title:', cleanWorkspace);
+                    console.log('🔗 Constructed workspace link:', workspaceLink);
+                  } else {
+                    // フォールバック: textContentから取得
+                    const workspaceFromText = text.substring(0, text.indexOf('Terraform plan:')).trim();
+                    const cleanWorkspace = workspaceFromText.replace(/[—\-]\s*.*$/, '').trim();
+                    workspaceLink = `<a href="${hrefMatch[1]}" target="_blank">${cleanWorkspace}</a>`;
+                    console.log('🔗 Fallback to text content:', cleanWorkspace);
+                  }
+                }
               }
+              
+              // 2行表示のHTMLを構築
+              const finalHTML = `
+                <span class="terraform-plan-line">${workspaceLink}</span>
+                <span class="terraform-plan-line">Terraform plan: ${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
+              `;
+              
+              console.log('🔧 Final HTML:', finalHTML);
+              el.innerHTML = `<span class="terraform-plan-result">${finalHTML}</span>`;
+              processed++;
+              console.log('✅ Processed element with preserved links:', el);
+            } else {
+              // リンクがない場合は従来の方法
+              const workspacePart = text.substring(0, text.indexOf('Terraform plan:')).trim();
+              const workspaceName = workspacePart.replace(/[—\-\s]+$/, '').trim();
+              
+              const createColoredCount = (count, type) => {
+                const num = parseInt(count);
+                const highlightClass = num > 0 ? ' highlight' : '';
+                return `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
+              };
+              
+              const coloredAdd = createColoredCount(add, 'add');
+              const coloredChange = createColoredCount(change, 'change');
+              const coloredDestroy = createColoredCount(destroy, 'destroy');
+              
+              const coloredHTML = `<span class="terraform-plan-result">
+                ${workspaceName ? `<span class="terraform-plan-line">${workspaceName}</span>` : ''}
+                <span class="terraform-plan-line">Terraform plan: ${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
+              </span>`;
+              
+              el.innerHTML = coloredHTML;
+              processed++;
+              console.log('✅ Processed element without links:', el);
             }
-            
-            // カラー表示用のHTML要素を作成（2行レイアウト）
-            const createColoredCount = (count, type) => {
-              const num = parseInt(count);
-              const highlightClass = num > 0 ? ' highlight' : '';
-              return `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
-            };
-            
-            const coloredAdd = createColoredCount(add, 'add');
-            const coloredChange = createColoredCount(change, 'change');
-            const coloredDestroy = createColoredCount(destroy, 'destroy');
-            
-            const coloredHTML = `<span class="terraform-plan-result">
-              ${workspaceHTML ? `<span class="terraform-plan-line">${workspaceHTML}</span>` : ''}
-              <span class="terraform-plan-line">Terraform plan: ${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
-            </span>`;
-            
-            // 要素の内容を完全に置き換え
-            el.innerHTML = coloredHTML;
-            processed++;
-            console.log('✅ Processed element with colors:', el)
           } else {
             // Terraform planパターンにマッチしない場合のみプレフィックス削除のみ実行
             if (text !== el.textContent) {
