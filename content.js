@@ -110,11 +110,6 @@
               el.innerHTML = coloredHTML;
               processed++;
             }
-          } else {
-            if (text !== el.textContent) {
-              el.textContent = text;
-              processed++;
-            }
           }
           
           el.dataset.terraformFormatted = 'true';
