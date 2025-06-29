@@ -2,19 +2,42 @@
 
 A Chrome/Edge extension that formats HCP Terraform (formerly Terraform Cloud) results on GitHub Pull Request pages, making them cleaner and more readable.
 
+## 📸 Screenshots
+
+### Enhanced Display
+
+![Extension in Action](store-assets/screenshots/screenshot1.png)
+
+HCP Terraform plan results with enhanced formatting
+
+### Clean Organization Display
+
+![Organization Prefix Removal](store-assets/screenshots/screenshot2.png)
+
+Long organization prefixes are automatically cleaned for better readability
+
+### Color-Coded Results
+
+![Color-Coded Plan Results](store-assets/screenshots/screenshot3.png)
+
+Plan results with visual color coding for add/change/destroy operations
+
 ## ✨ Features
 
 ### 🔧 Clean Organization Prefixes
+
 Automatically removes long organization/project prefixes:
-```
+
+```text
 Before: Terraform Cloud/my-org-name/my-workspace-name
 After:  my-workspace-name
 ```
 
 ### 🎨 Color-Coded Plan Results
+
 Displays Terraform plan results in a clean 2-line layout with visual highlights:
 
-```
+```text
 my-workspace-name
 Terraform plan: 1 to add, 0 to change, 1 to destroy
 ```
@@ -25,12 +48,14 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 - **Zero values**: Default styling
 
 ### ⚡ Automatic Operation
+
 - Works automatically on GitHub PR pages
 - Supports page navigation and dynamic content loading
 - Compatible with both Chrome and Edge browsers
 - Works with GitHub Enterprise (EMU) environments
 
 ### 🔔 Activity Badge
+
 - Shows processing count on extension icon
 - Green badge indicates successful operation
 - Tooltip displays detailed information
@@ -50,7 +75,7 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 
 ## 📁 File Structure
 
-```
+```text
 .
 ├── manifest.json    # Extension configuration (Manifest V3)
 ├── content.js       # Main script with DOM manipulation
