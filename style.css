@@ -24,32 +24,32 @@
   font-weight: 600;
 }
 
-/* Add - 青色 */
-.terraform-count.add {
+/* Add - 青色（0以外の場合のみ） */
+.terraform-count.add.highlight {
   color: #0366d6;
 }
 
-/* Change - オレンジ色 */
-.terraform-count.change {
+/* Change - オレンジ色（0以外の場合のみ） */
+.terraform-count.change.highlight {
   color: #e36209;
 }
 
-/* Destroy - 赤色 */
-.terraform-count.destroy {
+/* Destroy - 赤色（0以外の場合のみ） */
+.terraform-count.destroy.highlight {
   color: #d73a49;
 }
 
-/* ダークモード対応 */
+/* ダークモード対応（0以外の場合のみ） */
 @media (prefers-color-scheme: dark) {
-  .terraform-count.add {
+  .terraform-count.add.highlight {
     color: #58a6ff;
   }
 
-  .terraform-count.change {
+  .terraform-count.change.highlight {
     color: #f0883e;
   }
 
-  .terraform-count.destroy {
+  .terraform-count.destroy.highlight {
     color: #f85149;
   }
 }
