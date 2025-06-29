@@ -211,6 +211,14 @@
       });
     });
 
+    // Send message to background script to update badge
+    if (processed > 0) {
+      chrome.runtime.sendMessage({
+        type: 'updateBadge',
+        count: processed
+      });
+    }
+
   }
 
   function handlePageLoadOrTransition() {

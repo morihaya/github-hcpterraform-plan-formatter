@@ -20,6 +20,7 @@ mkdir -p "$BUILD_DIR" "$DIST_DIR"
 # Copy necessary files
 echo "Copying files..."
 cp manifest.json "$BUILD_DIR/"
+cp background.js "$BUILD_DIR/" 2>/dev/null || true
 cp content.js "$BUILD_DIR/" 2>/dev/null || true
 cp style.css "$BUILD_DIR/" 2>/dev/null || true
 cp -r icons/ "$BUILD_DIR/" 2>/dev/null || true
