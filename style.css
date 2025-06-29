@@ -11,6 +11,11 @@
   margin: 1px 0;
 }
 
+.terraform-plan-line:first-child {
+  margin-left: 4px;
+  padding-left: 2px;
+}
+
 .terraform-count {
   font-weight: normal;
 }
