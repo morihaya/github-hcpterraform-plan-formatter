@@ -17,7 +17,13 @@
     ciCheckTitleSelectors.forEach((selector) => {
       const elements = document.querySelectorAll(selector);
       elements.forEach((el) => {
-        if (el.dataset.terraformFormatted === 'true') {
+        // Skip if already processed or if it's a terraform-plan-result element
+        if (el.dataset.terraformFormatted === 'true' || el.classList.contains('terraform-plan-result')) {
+          return;
+        }
+        
+        // Skip if this element contains a terraform-plan-result (already processed by a child)
+        if (el.querySelector('.terraform-plan-result')) {
           return;
         }
 
@@ -33,15 +39,17 @@
 
           // Try multiple patterns to extract workspace name
           const patterns = [
-            /Terraform Cloud\/([^/]+)\/(.+?)(?:\s+[-—]?\s*Terraform plan:|Terraform plan:)/,
-            /Terraform Cloud\/([^/]+)\/([^\s]+)/,
-            /Terraform Cloud\/[^/]+\/(.+?)(?:\s|$)/
+            /Terraform Cloud\/([^/]+)\/(.+?)(?:\s+[-—]\s*Terraform plan:|Terraform plan:)/,
+            /Terraform Cloud\/([^/]+)\/([^\s\-—]+)/,
+            /Terraform Cloud\/[^/]+\/(.+?)(?=\s+[-—]|\s*$)/
           ];
 
           for (const pattern of patterns) {
             const match = text.match(pattern);
             if (match) {
               workspaceDisplayName = match[2] ? match[2].trim() : match[1].trim();
+              // Remove any trailing separators
+              workspaceDisplayName = workspaceDisplayName.replace(/[-—\s]+$/, '');
               console.log('Debug - Extracted workspace name:', workspaceDisplayName);
               break;
             }
@@ -54,20 +62,33 @@
               const pathParts = parts.split('/');
               if (pathParts.length >= 2) {
                 workspaceDisplayName = pathParts.slice(1).join('/').split(/\s+/)[0];
+                // Remove any separators
+                workspaceDisplayName = workspaceDisplayName.replace(/[-—\s]+.*$/, '');
                 console.log('Debug - Fallback workspace name:', workspaceDisplayName);
               }
             }
           }
+          
+          // Final check: make sure workspace name is not just a separator
+          if (workspaceDisplayName && /^[-—\s]*$/.test(workspaceDisplayName)) {
+            workspaceDisplayName = '';
+          }
 
           // Replace the full Terraform Cloud path with just the workspace name
           if (workspaceDisplayName) {
-            text = text.replace(/Terraform Cloud\/[^/]+\/[^\s]+/, workspaceDisplayName);
+            // Remove the entire original Terraform Cloud line and any separators
+            text = text.replace(/Terraform Cloud\/[^/]+\/[^\r\n]*[-—\s]*\r?\n?/g, '');
+            text = text.replace(/^[-—\s]*\r?\n?/gm, ''); // Remove separator lines
+            text = text.trim();
           }
 
           const planMatch = text.match(/Terraform plan:\s*(\d+)\s*to add,\s*(\d+)\s*to change,\s*(\d+)\s*to destroy/);
 
           if (planMatch) {
             const [, add, change, destroy] = planMatch;
+
+            // Completely replace the element content to avoid showing original text
+            el.style.display = 'block';
 
             if (originalHTML.includes('<a ') && originalHTML.includes('href=')) {
 
@@ -115,7 +136,10 @@
 
               const finalHTML = `<div class="terraform-plan-line">${workspaceLink || 'Terraform Workspace'}</div><div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div>`;
 
+              // Clear existing content and set new content
+              el.innerHTML = '';
               el.innerHTML = `<div class="terraform-plan-result">${finalHTML}</div>`;
+              el.style.whiteSpace = 'normal';
               processed++;
             } else {
               // For non-link elements, use the extracted workspace name
@@ -141,7 +165,10 @@
 
               const coloredHTML = `<div class="terraform-plan-result">${workspaceName && workspaceName.length > 0 ? `<div class="terraform-plan-line">${workspaceName}</div>` : `<div class="terraform-plan-line">Terraform Workspace</div>`}<div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div></div>`;
 
+              // Clear existing content and set new content
+              el.innerHTML = '';
               el.innerHTML = coloredHTML;
+              el.style.whiteSpace = 'normal';
               processed++;
             }
           }
