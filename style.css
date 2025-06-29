@@ -5,6 +5,7 @@
   font-weight: 500;
   line-height: 1.4;
   display: block !important;
+  overflow: visible !important;
 }
 
 .terraform-plan-line {

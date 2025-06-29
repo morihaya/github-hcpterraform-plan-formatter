@@ -18,8 +18,12 @@
     },
     "default_title": "GitHub HCP Terraform Plan Formatter"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "tabs"
   ],
   "host_permissions": [
     "*://github.com/*"
