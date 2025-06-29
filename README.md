@@ -75,6 +75,10 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 - Pages with HCP Terraform (formerly Terraform Cloud) check results
 - Compatible with GitHub Enterprise environments
 
+## 🙏 Acknowledgments
+
+Special thanks to [github-web-cosmetic](https://github.com/officel/github-web-cosmetic) for providing the foundational approach and techniques that made this extension possible. The robust DOM manipulation patterns and GitHub SPA navigation handling were instrumental in creating a stable and reliable solution.
+
 ## 📝 Version History
 
 - **v1.0.0**: Initial release with core formatting features
