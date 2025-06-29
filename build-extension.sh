@@ -23,10 +23,10 @@ cp manifest.json "$BUILD_DIR/"
 cp background.js "$BUILD_DIR/" 2>/dev/null || true
 cp content.js "$BUILD_DIR/" 2>/dev/null || true
 cp style.css "$BUILD_DIR/" 2>/dev/null || true
-cp -r icons/ "$BUILD_DIR/" 2>/dev/null || true
-cp -r src/ "$BUILD_DIR/" 2>/dev/null || true
-cp -r css/ "$BUILD_DIR/" 2>/dev/null || true
-cp -r js/ "$BUILD_DIR/" 2>/dev/null || true
+cp -r icons "$BUILD_DIR/" 2>/dev/null || true
+cp -r src "$BUILD_DIR/" 2>/dev/null || true
+cp -r css "$BUILD_DIR/" 2>/dev/null || true
+cp -r js "$BUILD_DIR/" 2>/dev/null || true
 cp README.md "$BUILD_DIR/" 2>/dev/null || true
 cp LICENSE "$BUILD_DIR/" 2>/dev/null || true
 
