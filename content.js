@@ -37,9 +37,22 @@
           if (planMatch) {
             const [, add, change, destroy] = planMatch;
             
+            // 元のHTML構造を保持してWorkspace名のリンクを抽出
+            const originalHTML = el.innerHTML;
+            
             // Workspace名を抽出（Terraform planより前の部分）
             const workspacePart = text.substring(0, text.indexOf('Terraform plan:')).trim();
             const workspaceName = workspacePart.replace(/[—\-\s]+$/, '').trim(); // 末尾の記号を削除
+            
+            // リンク部分を保持（aタグがある場合）
+            let workspaceHTML = workspaceName;
+            if (originalHTML.includes('<a ') && workspaceName) {
+              // 既存のリンクタグを探して保持
+              const linkMatch = originalHTML.match(/<a[^>]*>([^<]*)<\/a>/);
+              if (linkMatch && linkMatch[1].includes(workspaceName.split(' ')[0])) {
+                workspaceHTML = linkMatch[0];
+              }
+            }
             
             // カラー表示用のHTML要素を作成（2行レイアウト）
             const createColoredCount = (count, type) => {
@@ -53,9 +66,8 @@
             const coloredDestroy = createColoredCount(destroy, 'destroy');
             
             const coloredHTML = `<span class="terraform-plan-result">
-              ${workspaceName ? `<span class="terraform-plan-line">${workspaceName}</span>` : ''}
-              <span class="terraform-plan-line">Terraform plan:</span>
-              <span class="terraform-plan-line">${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
+              ${workspaceHTML ? `<span class="terraform-plan-line">${workspaceHTML}</span>` : ''}
+              <span class="terraform-plan-line">Terraform plan: ${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
             </span>`;
             
             // 要素の内容を完全に置き換え
