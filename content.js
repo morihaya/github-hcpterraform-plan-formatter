@@ -84,12 +84,9 @@
                 }
               }
 
-              const finalHTML = `
-                <span class="terraform-plan-line">${workspaceLink}</span>
-                <span class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</span>
-              `;
+              const finalHTML = `<div class="terraform-plan-line">${workspaceLink}</div><div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div>`;
 
-              el.innerHTML = `<span class="terraform-plan-result">${finalHTML}</span>`;
+              el.innerHTML = `<div class="terraform-plan-result">${finalHTML}</div>`;
               processed++;
             } else {
               // For non-link elements, use the extracted workspace name
@@ -111,10 +108,7 @@
               const coloredChange = createColoredSentence(change, 'change', 'change');
               const coloredDestroy = createColoredSentence(destroy, 'destroy', 'destroy');
 
-              const coloredHTML = `<span class="terraform-plan-result">
-                ${workspaceName ? `<span class="terraform-plan-line">${workspaceName}</span>` : ''}
-                <span class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</span>
-              </span>`;
+              const coloredHTML = `<div class="terraform-plan-result">${workspaceName ? `<div class="terraform-plan-line">${workspaceName}</div>` : ''}<div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div></div>`;
 
               el.innerHTML = coloredHTML;
               processed++;
