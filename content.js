@@ -32,8 +32,7 @@
           return;
         }
 
-        // Only process elements that contain both workspace name and plan
-        if (el.textContent && el.textContent.includes('Terraform Cloud/') && el.textContent.includes('Terraform plan:')) {
+        if (el.textContent && (el.textContent.includes('Terraform plan:') || el.textContent.includes('Terraform Cloud/'))) {
           let text = el.textContent;
           const originalHTML = el.innerHTML;
 
@@ -48,18 +47,13 @@
 
             if (spanMatch && spanMatch[2]) {
               workspaceDisplayName = spanMatch[2].trim();
-              console.log('Debug - Extracted from span:', workspaceDisplayName);
             } else if (linkTextMatch && linkTextMatch[2]) {
               workspaceDisplayName = linkTextMatch[2].trim();
-              console.log('Debug - Extracted from link text:', workspaceDisplayName);
             }
           }
 
           // If not found in HTML, try text patterns
           if (!workspaceDisplayName) {
-            // Debug: log the original text
-            console.log('Debug - Original text:', text);
-
             // Try multiple patterns to extract workspace name
             const patterns = [
               /Terraform Cloud\/([^/]+)\/([^/\s\-—\r\n]+)/,  // More precise pattern to avoid separators
@@ -77,7 +71,6 @@
 
                 // Validate that the workspace name is not empty or just separators
                 if (workspaceDisplayName && !/^[-—\s]*$/.test(workspaceDisplayName)) {
-                  console.log('Debug - Extracted workspace name:', workspaceDisplayName);
                   break;
                 } else {
                   workspaceDisplayName = '';
@@ -95,7 +88,6 @@
                 workspaceDisplayName = pathParts.slice(1).join('/').split(/\s+/)[0];
                 // Remove any separators
                 workspaceDisplayName = workspaceDisplayName.replace(/[-—\s]+.*$/, '');
-                console.log('Debug - Fallback workspace name:', workspaceDisplayName);
               }
             }
           }
@@ -103,7 +95,6 @@
           // Final check: make sure workspace name is not just a separator or invalid
           if (workspaceDisplayName && (/^[-—\s]*$/.test(workspaceDisplayName) || workspaceDisplayName === '—')) {
             workspaceDisplayName = '';
-            console.log('Debug - Rejected invalid workspace name');
           }
 
           // If we still don't have a valid workspace name, try to extract from title attribute
@@ -114,7 +105,6 @@
               const titleWorkspaceMatch = titleContent.match(/Terraform Cloud\/[^/]+\/([^\s]+)/);
               if (titleWorkspaceMatch && titleWorkspaceMatch[1]) {
                 workspaceDisplayName = titleWorkspaceMatch[1].trim();
-                console.log('Debug - Extracted from title:', workspaceDisplayName);
               }
             }
           }
@@ -189,8 +179,6 @@
             } else {
               // For non-link elements, use the extracted workspace name
               const workspaceName = workspaceDisplayName || text.substring(0, text.indexOf('Terraform plan:')).trim();
-
-              console.log('Debug - Final workspace name for display:', workspaceName);
 
               const createColoredSentence = (count, type, action) => {
                 const num = parseInt(count);
