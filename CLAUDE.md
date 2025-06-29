@@ -2,8 +2,8 @@
 
 ## プロジェクト概要
 
-GitHubのPull Requestページで表示されるTerraform Cloudの実行結果を整形するChrome拡張機能。
-長いプレフィックスを削除し、プラン結果を読みやすい形式で表示する。
+GitHubのPull Requestページで表示されるHCP Terraform（旧Terraform Cloud）の実行結果を整形するChrome拡張機能。
+長い組織名・ワークスペース名プレフィックスを削除し、プラン結果を読みやすい形式で表示する。
 
 ## 開発環境
 
@@ -49,7 +49,7 @@ GitHubのPull Requestページで表示されるTerraform Cloudの実行結果�
 
 3. テキスト処理
    ├─ 処理済みチェック (data-terraform-formatted)
-   ├─ Terraform Cloud/PROJECT/ プレフィックス削除
+   ├─ Terraform Cloud/<ORG_NAME>/ プレフィックス削除
    ├─ プラン数値の簡潔化
    └─ 処理済みマーク付与
 
@@ -100,3 +100,4 @@ GitHubのPull Requestページで表示されるTerraform Cloudの実行結果�
 - 参考拡張機能のアプローチが非常に有効
 - GitHub EMUとの互換性も確保済み
 - 無限ループ対策が重要なポイント
+- HCP Terraform（旧Terraform Cloud）の汎用的対応

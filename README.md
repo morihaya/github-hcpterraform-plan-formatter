@@ -1,14 +1,14 @@
 # GitHub Terraform Plan Formatter
 
-GitHubのPRページで表示されるTerraform CI結果を整形し、シンプルで読みやすい形式で表示するChrome/Edge拡張機能です。
+GitHubのPRページで表示されるHCP Terraform（旧Terraform Cloud）の実行結果を整形し、シンプルで読みやすい形式で表示するChrome/Edge拡張機能です。
 
 ## 機能
 
-### 1. Terraform Cloudプレフィックス削除
+### 1. HCP Terraformプレフィックス削除
 長い組織名・プロジェクト名を自動削除:
 ```
-変更前: Terraform Cloud/AEON-Smart-Technology/Azure_RM-iAEON-Staging-Common_iAEON
-変更後: Azure_RM-iAEON-Staging-Common_iAEON
+変更前: Terraform Cloud/<ORG_NAME>/<WORKSPACE_NAME>
+変更後: <WORKSPACE_NAME>
 ```
 
 ### 2. プラン結果の簡潔表示
@@ -52,14 +52,14 @@ Terraformプランの結果を「`Terraform plan: X to add, Y to change, Z to de
 ## 動作確認
 
 1. 拡張機能をインストール後、GitHubのPRページにアクセス
-2. Terraform Cloudのチェック結果が表示されているPRで動作確認
+2. HCP Terraformのチェック結果が表示されているPRで動作確認
 3. F12でコンソールを開き、処理ログを確認可能
 4. 結果が簡潔な形式で表示されることを確認
 
 ## 対象ページ
 
 - `https://github.com/*/pull/*` パターンのPRページ
-- Terraform Cloudのチェック結果が表示されているページ
+- HCP Terraform（旧Terraform Cloud）のチェック結果が表示されているページ
 
 ## 開発履歴
 

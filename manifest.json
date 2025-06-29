@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "GitHub Terraform Plan Formatter",
   "version": "1.0.0",
-  "description": "Formats Terraform plan results on GitHub PR pages to show simplified add/change/destroy counts",
+  "description": "Formats HCP Terraform plan results on GitHub PR pages by removing org prefixes and showing simplified add/change/destroy counts",
   "permissions": [
     "activeTab"
   ],
