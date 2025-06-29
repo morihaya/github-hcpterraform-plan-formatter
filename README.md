@@ -11,8 +11,19 @@ GitHubのPRページで表示されるHCP Terraform（旧Terraform Cloud）の�
 変更後: <WORKSPACE_NAME>
 ```
 
-### 2. プラン結果の簡潔表示
-Terraformプランの結果を「`Terraform plan: X to add, Y to change, Z to destroy`」の形式で統一表示
+### 2. プラン結果のカラー表示
+Terraformプランの結果を3行レイアウトで見やすく表示し、数値に応じたカラー表示:
+
+```
+<WORKSPACE_NAME>
+Terraform plan:
+1 to add, 0 to change, 1 to destroy
+```
+
+- **Add（追加）**: 青色表示、0以外の場合は太字
+- **Change（変更）**: オレンジ色表示、0以外の場合は太字  
+- **Destroy（削除）**: 赤色表示、0以外の場合は太字
+- **0の数値**: 通常フォント、背景色なし
 
 ### 3. 自動動作
 - GitHubのPRページで自動的に動作
@@ -37,6 +48,7 @@ Terraformプランの結果を「`Terraform plan: X to add, Y to change, Z to de
 .
 ├── manifest.json    # 拡張機能の設定（Manifest V3）
 ├── content.js       # メインスクリプト（IIFE形式、無限ループ対策済み）
+├── style.css        # カラー表示用スタイルシート
 ├── README.md        # このファイル
 └── CLAUDE.md        # 開発情報
 ```
@@ -66,4 +78,5 @@ Terraformプランの結果を「`Terraform plan: X to add, Y to change, Z to de
 - v1.0.0: 基本機能実装
 - プレフィックス削除機能追加
 - 無限ループ対策実装
-- github-web-cosmetic拡張機能のアプローチを参考に安定化
+- GitHub-web-cosmetic拡張機能のアプローチを参考に安定化
+- カラー表示機能追加（数値別の色分けと強調表示）

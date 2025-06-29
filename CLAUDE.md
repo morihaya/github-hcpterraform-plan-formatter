@@ -88,11 +88,20 @@ GitHubのPull Requestページで表示されるHCP Terraform（旧Terraform Clo
 - `✅ Processed element:` - 要素処理完了
 - `🎯 Processed X Terraform elements` - 処理件数
 
+## 実装済み機能
+
+### カラー表示機能
+- **Add**: 青色（#3b82f6）、数値>0で強調表示
+- **Change**: オレンジ色（#f59e0b）、数値>0で強調表示  
+- **Destroy**: 赤色（#ef4444）、数値>0で強調表示
+- **ダークモード対応**: システム設定に応じた色調整
+
 ## 今後の改善案
 
 1. **設定画面追加**: プレフィックス削除の有効/無効切り替え
 2. **カスタムパターン**: ユーザー定義の置換ルール
 3. **他CI対応**: GitHub Actions、Jenkins等への対応拡張
+4. **カラーカスタマイズ**: ユーザー定義の色設定
 
 ## 開発メモ
 

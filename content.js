@@ -28,6 +28,7 @@
           let text = el.textContent;
           
           // 1. "Terraform Cloud/PROJECT/" プレフィックスを削除
+          const originalText = text;
           text = text.replace(/Terraform Cloud\/[^/]+\//, '');
           
           // 2. Terraform planの数値を簡潔にフォーマット
@@ -35,19 +36,39 @@
           
           if (planMatch) {
             const [, add, change, destroy] = planMatch;
-            const simplifiedText = `Terraform plan: ${add} to add, ${change} to change, ${destroy} to destroy`;
             
-            text = text.replace(
-              /Terraform plan:\s*\d+\s*to add,\s*\d+\s*to change,\s*\d+\s*to destroy\.?/,
-              simplifiedText
-            );
-          }
-          
-          // テキストが変更された場合のみ適用
-          if (text !== el.textContent) {
-            el.textContent = text;
+            // Workspace名を抽出（Terraform planより前の部分）
+            const workspacePart = text.substring(0, text.indexOf('Terraform plan:')).trim();
+            const workspaceName = workspacePart.replace(/[—\-\s]+$/, '').trim(); // 末尾の記号を削除
+            
+            // カラー表示用のHTML要素を作成（2行レイアウト）
+            const createColoredCount = (count, type) => {
+              const num = parseInt(count);
+              const highlightClass = num > 0 ? ' highlight' : '';
+              return `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
+            };
+            
+            const coloredAdd = createColoredCount(add, 'add');
+            const coloredChange = createColoredCount(change, 'change');
+            const coloredDestroy = createColoredCount(destroy, 'destroy');
+            
+            const coloredHTML = `<span class="terraform-plan-result">
+              ${workspaceName ? `<span class="terraform-plan-line">${workspaceName}</span>` : ''}
+              <span class="terraform-plan-line">Terraform plan:</span>
+              <span class="terraform-plan-line">${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
+            </span>`;
+            
+            // 要素の内容を完全に置き換え
+            el.innerHTML = coloredHTML;
             processed++;
-            console.log('✅ Processed element:', el);
+            console.log('✅ Processed element with colors:', el)
+          } else {
+            // Terraform planパターンにマッチしない場合のみプレフィックス削除のみ実行
+            if (text !== el.textContent) {
+              el.textContent = text;
+              processed++;
+              console.log('✅ Processed element (prefix only):', el);
+            }
           }
           
           // 処理済みマークを付ける
