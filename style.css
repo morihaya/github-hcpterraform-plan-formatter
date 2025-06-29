@@ -85,3 +85,22 @@ div.TimelineItem strong .terraform-plan-result {
   display: block !important;
   max-width: none !important;
 }
+
+/* Edge ブラウザ対応 */
+@supports (-ms-ime-align: auto) {
+  .terraform-plan-result {
+    display: block !important;
+  }
+
+  .terraform-plan-line {
+    display: block !important;
+    clear: both !important;
+  }
+}
+
+/* 追加の強制表示対応 */
+.terraform-plan-line:empty::before {
+  content: "Terraform Workspace";
+  color: #666;
+  font-style: italic;
+}

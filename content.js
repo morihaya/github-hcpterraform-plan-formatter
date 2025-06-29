@@ -27,11 +27,40 @@
 
           // Extract workspace name more carefully
           let workspaceDisplayName = '';
-          const terraformCloudMatch = text.match(/Terraform Cloud\/([^/]+)\/(.+?)(?:\s+[-—]?\s*Terraform plan:|Terraform plan:)/);
-          if (terraformCloudMatch) {
-            // [1] is organization, [2] is workspace name
-            workspaceDisplayName = terraformCloudMatch[2].trim();
-            // Replace the full Terraform Cloud path with just the workspace name
+
+          // Debug: log the original text
+          console.log('Debug - Original text:', text);
+
+          // Try multiple patterns to extract workspace name
+          const patterns = [
+            /Terraform Cloud\/([^/]+)\/(.+?)(?:\s+[-—]?\s*Terraform plan:|Terraform plan:)/,
+            /Terraform Cloud\/([^/]+)\/([^\s]+)/,
+            /Terraform Cloud\/[^/]+\/(.+?)(?:\s|$)/
+          ];
+
+          for (const pattern of patterns) {
+            const match = text.match(pattern);
+            if (match) {
+              workspaceDisplayName = match[2] ? match[2].trim() : match[1].trim();
+              console.log('Debug - Extracted workspace name:', workspaceDisplayName);
+              break;
+            }
+          }
+
+          // If still no workspace name, try a simpler extraction
+          if (!workspaceDisplayName && text.includes('Terraform Cloud/')) {
+            const parts = text.split('Terraform Cloud/')[1];
+            if (parts) {
+              const pathParts = parts.split('/');
+              if (pathParts.length >= 2) {
+                workspaceDisplayName = pathParts.slice(1).join('/').split(/\s+/)[0];
+                console.log('Debug - Fallback workspace name:', workspaceDisplayName);
+              }
+            }
+          }
+
+          // Replace the full Terraform Cloud path with just the workspace name
+          if (workspaceDisplayName) {
             text = text.replace(/Terraform Cloud\/[^/]+\/[^\s]+/, workspaceDisplayName);
           }
 
@@ -84,13 +113,15 @@
                 }
               }
 
-              const finalHTML = `<div class="terraform-plan-line">${workspaceLink}</div><div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div>`;
+              const finalHTML = `<div class="terraform-plan-line">${workspaceLink || 'Terraform Workspace'}</div><div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div>`;
 
               el.innerHTML = `<div class="terraform-plan-result">${finalHTML}</div>`;
               processed++;
             } else {
               // For non-link elements, use the extracted workspace name
               const workspaceName = workspaceDisplayName || text.substring(0, text.indexOf('Terraform plan:')).trim();
+
+              console.log('Debug - Final workspace name for display:', workspaceName);
 
               const createColoredSentence = (count, type, action) => {
                 const num = parseInt(count);
@@ -108,7 +139,7 @@
               const coloredChange = createColoredSentence(change, 'change', 'change');
               const coloredDestroy = createColoredSentence(destroy, 'destroy', 'destroy');
 
-              const coloredHTML = `<div class="terraform-plan-result">${workspaceName ? `<div class="terraform-plan-line">${workspaceName}</div>` : ''}<div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div></div>`;
+              const coloredHTML = `<div class="terraform-plan-result">${workspaceName && workspaceName.length > 0 ? `<div class="terraform-plan-line">${workspaceName}</div>` : `<div class="terraform-plan-line">Terraform Workspace</div>`}<div class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</div></div>`;
 
               el.innerHTML = coloredHTML;
               processed++;
