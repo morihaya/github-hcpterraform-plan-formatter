@@ -24,6 +24,10 @@
   font-weight: 600;
 }
 
+.terraform-sentence.highlight {
+  text-decoration: underline !important;
+}
+
 /* Add - 青色（0以外の場合のみ） */
 .terraform-count.add.highlight {
   color: #0366d6;

@@ -41,16 +41,22 @@
             if (originalHTML.includes('<a ') && originalHTML.includes('href=')) {
               console.log('🔗 Link detected, using HTML replacement approach');
               
-              // カラー表示用のHTML要素を作成（2行レイアウト）
-              const createColoredCount = (count, type) => {
+              // カラー表示用のHTML要素を作成（センテンス全体を太字化）
+              const createColoredSentence = (count, type, action) => {
                 const num = parseInt(count);
                 const highlightClass = num > 0 ? ' highlight' : '';
-                return `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
+                const countSpan = `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
+                
+                if (num > 0) {
+                  return `<span class="terraform-sentence highlight">${countSpan} to ${action}</span>`;
+                } else {
+                  return `${countSpan} to ${action}`;
+                }
               };
               
-              const coloredAdd = createColoredCount(add, 'add');
-              const coloredChange = createColoredCount(change, 'change');
-              const coloredDestroy = createColoredCount(destroy, 'destroy');
+              const coloredAdd = createColoredSentence(add, 'add', 'add');
+              const coloredChange = createColoredSentence(change, 'change', 'change');
+              const coloredDestroy = createColoredSentence(destroy, 'destroy', 'destroy');
               
               // より確実な方法でリンクを保持して2行表示を実現
               console.log('🔧 Original HTML before processing:', originalHTML);
@@ -65,12 +71,12 @@
                 // リンク内のテキストを抽出（spanタグを含む場合も対応）
                 const linkInnerMatch = linkMatch[0].match(/>([^<]+)</);
                 if (linkInnerMatch) {
-                  let linkText = linkInnerMatch[1];
+                  // linkText = linkInnerMatch[1]; // 未使用のため削除
                 } else {
                   // spanタグ内のテキストを抽出
                   const spanMatch = linkMatch[0].match(/<span[^>]*>([^<]+)<\/span>/);
                   if (spanMatch) {
-                    let linkText = spanMatch[1];
+                    // linkText = spanMatch[1]; // 未使用のため削除
                   }
                 }
                 
@@ -102,7 +108,7 @@
               // 2行表示のHTMLを構築
               const finalHTML = `
                 <span class="terraform-plan-line">${workspaceLink}</span>
-                <span class="terraform-plan-line">Terraform plan: ${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
+                <span class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</span>
               `;
               
               console.log('🔧 Final HTML:', finalHTML);
@@ -114,19 +120,25 @@
               const workspacePart = text.substring(0, text.indexOf('Terraform plan:')).trim();
               const workspaceName = workspacePart.replace(/[—\-\s]+$/, '').trim();
               
-              const createColoredCount = (count, type) => {
+              const createColoredSentence = (count, type, action) => {
                 const num = parseInt(count);
                 const highlightClass = num > 0 ? ' highlight' : '';
-                return `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
+                const countSpan = `<span class="terraform-count ${type}${highlightClass}">${count}</span>`;
+                
+                if (num > 0) {
+                  return `<span class="terraform-sentence highlight">${countSpan} to ${action}</span>`;
+                } else {
+                  return `${countSpan} to ${action}`;
+                }
               };
               
-              const coloredAdd = createColoredCount(add, 'add');
-              const coloredChange = createColoredCount(change, 'change');
-              const coloredDestroy = createColoredCount(destroy, 'destroy');
+              const coloredAdd = createColoredSentence(add, 'add', 'add');
+              const coloredChange = createColoredSentence(change, 'change', 'change');
+              const coloredDestroy = createColoredSentence(destroy, 'destroy', 'destroy');
               
               const coloredHTML = `<span class="terraform-plan-result">
                 ${workspaceName ? `<span class="terraform-plan-line">${workspaceName}</span>` : ''}
-                <span class="terraform-plan-line">Terraform plan: ${coloredAdd} to add, ${coloredChange} to change, ${coloredDestroy} to destroy</span>
+                <span class="terraform-plan-line">Terraform plan: ${coloredAdd}, ${coloredChange}, ${coloredDestroy}</span>
               </span>`;
               
               el.innerHTML = coloredHTML;
