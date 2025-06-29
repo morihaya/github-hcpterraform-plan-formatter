@@ -20,10 +20,6 @@
   font-weight: normal;
 }
 
-.terraform-count.highlight {
-  font-weight: 600;
-}
-
 .terraform-sentence.highlight {
   text-decoration: underline !important;
 }
