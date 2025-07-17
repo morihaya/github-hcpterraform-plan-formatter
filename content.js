@@ -18,7 +18,9 @@
       const elements = document.querySelectorAll(selector);
       elements.forEach((el) => {
         // Skip if already processed or if it's a terraform-plan-result element
-        if (el.dataset.terraformFormatted === 'true' || el.classList.contains('terraform-plan-result')) {
+        // BUT re-process if it contains "Terraform Workspace" (incorrect formatting)
+        if ((el.dataset.terraformFormatted === 'true' || el.classList.contains('terraform-plan-result')) && 
+            !el.textContent.includes('Terraform Workspace')) {
           return;
         }
 
@@ -32,7 +34,7 @@
           return;
         }
 
-        if (el.textContent && (el.textContent.includes('Terraform plan:') || el.textContent.includes('Terraform Cloud/'))) {
+        if (el.textContent && (el.textContent.includes('Terraform plan:') || el.textContent.includes('Terraform Cloud/') || el.textContent.includes('No changes') || el.textContent.includes('Terraform plan has no changes'))) {
           let text = el.textContent;
           const originalHTML = el.innerHTML;
 
@@ -118,6 +120,13 @@
           }
 
           const planMatch = text.match(/Terraform plan:\s*(\d+)\s*to add,\s*(\d+)\s*to change,\s*(\d+)\s*to destroy/);
+          const noChangesMatch = text.match(/Terraform plan:\s*No changes/) || text.match(/No changes/) || text.match(/Terraform plan has no changes/);
+          
+          // Check if this is a processed workspace name that needs "No changes" formatting
+          const isProcessedWorkspace = text.includes('Terraform Cloud/') && !text.includes('Terraform plan:') && !text.includes('to add') && !text.includes('to change') && !text.includes('to destroy');
+          
+          // Check if this is a titleDescription element with "Terraform plan has no changes"
+          const isTitleDescriptionNoChanges = text.includes('Terraform plan has no changes') && (el.classList.contains('titleDescription') || el.className.includes('titleDescription'));
 
           if (planMatch) {
             const [, add, change, destroy] = planMatch;
@@ -204,11 +213,82 @@
               el.style.whiteSpace = 'normal';
               processed++;
             }
+          } else if (noChangesMatch) {
+            // Handle "No changes" case
+            el.style.display = 'block';
+
+            if (originalHTML.includes('<a ') && originalHTML.includes('href=')) {
+              const linkMatch = originalHTML.match(/<a[^>]*href="[^"]*"[^>]*>.*?<\/a>/s);
+              let workspaceLink = '';
+
+              if (linkMatch) {
+                const titleMatch = linkMatch[0].match(/title="([^"]*)"/);
+                const hrefMatch = linkMatch[0].match(/href="([^"]*)"/);
+
+                if (titleMatch && hrefMatch) {
+                  const titleContent = titleMatch[1];
+                  const workspaceMatch = titleContent.match(/Terraform Cloud\/([^/]+)\/(.+?)(?:\s+[-—]?\s*Terraform plan:|$)/);
+                  if (workspaceMatch) {
+                    const cleanWorkspace = workspaceMatch[2].trim();
+                    workspaceLink = `<a href="${hrefMatch[1]}" target="_blank">${cleanWorkspace}</a>`;
+                  } else {
+                    const cleanWorkspace = workspaceDisplayName || text.substring(0, text.indexOf('Terraform plan:')).trim();
+                    workspaceLink = `<a href="${hrefMatch[1]}" target="_blank">${cleanWorkspace}</a>`;
+                  }
+                }
+              }
+
+              const finalHTML = `<div class="terraform-plan-line">${workspaceLink || 'Terraform Workspace'}</div><div class="terraform-plan-line">Terraform plan: No changes</div>`;
+              el.innerHTML = '';
+              el.innerHTML = `<div class="terraform-plan-result">${finalHTML}</div>`;
+              el.style.whiteSpace = 'normal';
+              processed++;
+            } else {
+              const workspaceName = workspaceDisplayName || text.substring(0, text.indexOf('Terraform plan:')).trim();
+              const noChangesHTML = `<div class="terraform-plan-result">${workspaceName && workspaceName.length > 0 ? `<div class="terraform-plan-line">${workspaceName}</div>` : `<div class="terraform-plan-line">Terraform Workspace</div>`}<div class="terraform-plan-line">Terraform plan: No changes</div></div>`;
+              
+              el.innerHTML = '';
+              el.innerHTML = noChangesHTML;
+              el.style.whiteSpace = 'normal';
+              processed++;
+            }
+          } else if (isProcessedWorkspace) {
+            // This is a processed workspace name that should have "No changes" formatting
+            // Display workspace name with "—" and "Terraform plan: No changes"
+            el.style.display = 'block';
+            const workspaceName = text.replace(/^Terraform Cloud\/[^/]+\//, '');
+            const finalHTML = `<div class="terraform-plan-line">${workspaceName}</div><div class="terraform-plan-line">—</div><div class="terraform-plan-line">Terraform plan: No changes</div>`;
+            el.innerHTML = `<div class="terraform-plan-result">${finalHTML}</div>`;
+            el.style.whiteSpace = 'normal';
+            processed++;
+          } else if (isTitleDescriptionNoChanges) {
+            // This is a titleDescription element with "Terraform plan has no changes"
+            // Display only "— Terraform plan: No changes" without workspace name
+            el.style.display = 'block';
+            const finalHTML = `<div class="terraform-plan-line">— Terraform plan: No changes</div>`;
+            el.innerHTML = `<div class="terraform-plan-result">${finalHTML}</div>`;
+            el.style.whiteSpace = 'normal';
+            processed++;
           }
 
           el.dataset.terraformFormatted = 'true';
         }
       });
+    });
+
+    // Fix any remaining "Terraform Workspace" displays
+    document.querySelectorAll('.terraform-plan-result').forEach(planResult => {
+      if (planResult.textContent.includes('Terraform Workspace')) {
+        const lines = planResult.querySelectorAll('.terraform-plan-line');
+        
+        // Find and fix the "Terraform Workspace" line
+        lines.forEach(line => {
+          if (line.textContent === 'Terraform Workspace') {
+            line.textContent = '—';
+            processed++;
+          }
+        });
+      }
     });
 
     // Send message to background script to update badge
