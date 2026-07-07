@@ -95,6 +95,34 @@ GitHubのPull Requestページで表示されるHCP Terraform（旧Terraform Clo
 コンソール（debugレベル）で以下を確認可能:
 - `🎯 Terraform Plan Formatter: formatted X element(s)` - 処理件数
 
+## Edge Add-ons申請メモ
+
+パッケージ更新時に聞かれる審査項目には、以下のような当たり障りのない説明を使う。
+
+### 単一目的
+
+GitHubのPull Requestページに表示されるHCP Terraform / Terraform Cloudのチェック結果を読みやすく整形するための拡張機能です。長い組織名プレフィックスを省略し、Terraform planのadd/change/destroy件数を見やすく表示します。
+
+### activeTab の正当化理由
+
+ユーザーが開いているGitHub Pull Requestページ上で、表示中のHCP Terraform / Terraform Cloudチェック結果を整形するために使用します。対象はユーザーが操作中のタブに限定されます。
+
+### tabs の正当化理由
+
+GitHubのSPA遷移やタブ更新時に、拡張機能のバッジ表示を適切に更新・リセットするために使用します。閲覧内容の収集や外部送信には使用しません。
+
+### Host permission justification
+
+The extension needs access to github.com so it can run on GitHub Pull Request pages and continue working after GitHub single-page app navigation. Formatting logic only runs on Pull Request pages and only modifies visible HCP Terraform / Terraform Cloud check result text.
+
+### リモートコード
+
+リモートコードは使用していません。拡張機能のJavaScript、CSS、画像などはすべてパッケージ内に含まれており、外部のJavaScriptやWasmを読み込みません。
+
+### データ使用状況・プライバシー
+
+ユーザーデータは収集、保存、外部送信しません。リポジトリ情報、ソースコード、Terraform planの内容、閲覧履歴、個人情報はいずれも外部に送信されません。処理はブラウザ内で完結します。
+
 ## 動作検証
 
 `node --check content.js background.js`で構文チェック。
