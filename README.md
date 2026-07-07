@@ -105,8 +105,8 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 
 ## 🎯 Target Pages
 
-- GitHub Pull Request pages: `https://github.com/*/pull/*`
-- Pages with HCP Terraform (formerly Terraform Cloud) check results
+- Injected on all `https://github.com/*` pages so SPA (soft) navigation into a PR works; formatting only runs on Pull Request pages (`/pull/<number>`)
+- Pages with HCP Terraform (formerly Terraform Cloud) check results — both the new `HCP Terraform/...` and legacy `Terraform Cloud/...` check-name prefixes are supported
 - Compatible with GitHub Enterprise environments
 
 ## 🙏 Acknowledgments
@@ -115,6 +115,13 @@ Special thanks to [github-web-cosmetic](https://github.com/officel/github-web-co
 
 ## 📝 Version History
 
+- **v1.2.0**: Major refactor for maintainability and resilience
+  - Support for the new `HCP Terraform/...` check-name prefix (in addition to legacy `Terraform Cloud/...`)
+  - Text-based detection (TreeWalker) so formatting survives GitHub UI/class-name changes
+  - Works after SPA soft navigation into a PR (content script now injected on all github.com pages)
+  - Rewrites only the smallest element containing the plan summary, preserving sibling controls like "Details"
+  - HTML escaping for injected content; embedded `<script>` JSON payloads are never touched
+- **v1.1.0**: "No changes" plan support with improved formatting
 - **v1.0.1**: Badge feature update with activity indicator
 - **v1.0.0**: Initial release with core formatting features
 - Prefix removal for cleaner workspace names
