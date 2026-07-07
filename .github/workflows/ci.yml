@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Syntax check
+        run: |
+          node --check content.js
+          node --check background.js
+
+      - name: Validate manifest.json
+        run: |
+          node -e "
+            const m = require('./manifest.json');
+            if (m.manifest_version !== 3) throw new Error('manifest_version must be 3');
+            if (!/^\d+\.\d+\.\d+$/.test(m.version)) throw new Error('invalid version: ' + m.version);
+            if (!m.content_scripts?.length) throw new Error('content_scripts missing');
+          "
+
+      - name: Install test dependencies
+        run: npm install --no-save jsdom
+
+      - name: DOM tests
+        run: node --test
+
+      - name: Build packages
+        run: ./build-extension.sh

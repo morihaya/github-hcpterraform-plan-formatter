@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # Keep GitHub Actions used in workflows up to date.
+  # This repo has no runtime package dependencies (plain JS extension),
+  # so github-actions is the only ecosystem to monitor.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"

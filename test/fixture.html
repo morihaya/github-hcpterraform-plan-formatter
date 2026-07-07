@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fixture: GitHub PR check rows</title>
+</head>
+<body>
+  <h1>HCP Terraform Plan Formatter fixtures</h1>
+
+  <!-- Case 1: legacy TimelineItem layout, everything inside one <strong> -->
+  <div class="TimelineItem" id="case1">
+    <strong>
+      <a title="Terraform Cloud/my-org/my-workspace-production — Terraform plan: 3 to add, 1 to change, 2 to destroy" href="https://app.terraform.io/run/1">Terraform Cloud/my-org/my-workspace-production</a>
+      — Terraform plan: 3 to add, 1 to change, 2 to destroy
+    </strong>
+  </div>
+
+  <!-- Case 2: new-style layout, no known class names, link and description are siblings -->
+  <div id="case2" class="prc-xyz123">
+    <a href="https://app.terraform.io/run/2" title="HCP Terraform/my-org/ws-network">HCP Terraform/my-org/ws-network</a>
+    <span> — Terraform plan: 0 to add, 2 to change, 0 to destroy</span>
+  </div>
+
+  <!-- Case 3: titleDescription with "no changes" -->
+  <span id="case3" class="titleDescription-abc123">Terraform plan has no changes.</span>
+
+  <!-- Case 4: StatusCheckRow with a Details link that must survive -->
+  <div id="case4" class="StatusCheckRow-xyz">
+    <a href="https://app.terraform.io/run/4" title="HCP Terraform/my-org/ws-app">HCP Terraform/my-org/ws-app</a>
+    <span>Terraform plan: 1 to add, 0 to change, 0 to destroy</span>
+    <a href="https://app.terraform.io/run/4" id="details-link">Details</a>
+  </div>
+
+  <!-- Case 5: unrelated "No changes" text must NOT be touched -->
+  <div id="case5">No changes requested on this file.</div>
+
+  <!-- Case 6: container for dynamically inserted check (MutationObserver test) -->
+  <div id="case6"></div>
+
+  <!-- Case 7: embedded JSON payload (like GitHub's react data) must stay untouched -->
+  <script type="application/json" id="embedded-data">{"check":"HCP Terraform/my-org/ws-embedded — Terraform plan: 9 to add, 9 to change, 9 to destroy"}</script>
+</body>
+</html>

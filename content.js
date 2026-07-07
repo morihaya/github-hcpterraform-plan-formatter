@@ -207,6 +207,10 @@
 
     if (target !== el) {
       stripProviderPrefix(el);
+      // Mark the wrapper too so the DOM reaches a stable state in one pass;
+      // freshly re-rendered content inside it is still caught by the
+      // text-node scan, which finds elements independently of this mark.
+      el.dataset.terraformFormatted = "true";
     }
     return 1;
   }
