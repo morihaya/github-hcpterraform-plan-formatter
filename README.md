@@ -1,6 +1,14 @@
+[![CI](https://github.com/morihaya/github-hcpterraform-plan-formatter/actions/workflows/ci.yml/badge.svg)](https://github.com/morihaya/github-hcpterraform-plan-formatter/actions/workflows/ci.yml)
+[![Dependabot Updates](https://github.com/morihaya/github-hcpterraform-plan-formatter/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/morihaya/github-hcpterraform-plan-formatter/actions/workflows/dependabot/dependabot-updates)
+
 # GitHub HCP Terraform Plan Formatter
 
 A Chrome/Edge extension that formats HCP Terraform (formerly Terraform Cloud) results on GitHub Pull Request pages, making them cleaner and more readable.
+
+## Stores
+
+- [Chrome Web Store](https://chromewebstore.google.com/detail/github-hcp-terraform-plan/jkgkbodmannfjfidngjejojmhhacolop)
+- [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ddclhlggkolkmeofiocfecepdekaipjj)
 
 ## 📸 Screenshots
 
