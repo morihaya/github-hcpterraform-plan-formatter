@@ -114,7 +114,8 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 ## 🎯 Target Pages
 
 - Injected on all `https://github.com/*` pages so SPA (soft) navigation into a PR works; formatting only runs on Pull Request pages (`/pull/<number>`)
-- Pages with HCP Terraform (formerly Terraform Cloud) check results — both the new `HCP Terraform/...` and legacy `Terraform Cloud/...` check-name prefixes are supported
+- CI status-check regions with HCP Terraform (formerly Terraform Cloud) results — PR descriptions and comments are not modified
+- Both the new `HCP Terraform/...` and legacy `Terraform Cloud/...` check-name prefixes are supported
 - Compatible with GitHub Enterprise environments
 
 ## 🙏 Acknowledgments

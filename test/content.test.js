@@ -77,6 +77,19 @@ test('leaves unrelated "No changes" text untouched', async () => {
   assert.equal(cleanText(document.getElementById("case5")), "No changes requested on this file.");
 });
 
+test("never formats Terraform plan text in the PR description", async () => {
+  const dom = loadPage();
+  const { document } = dom.window;
+  await sleep(50);
+
+  const description = document.getElementById("pr-description");
+  assert.equal(
+    cleanText(description),
+    "HCP Terraform plan: 7 to add, 8 to change, 9 to destroy"
+  );
+  assert.equal(description.querySelectorAll(".terraform-plan-result").length, 0);
+});
+
 test("never touches embedded JSON script payloads", async () => {
   const dom = loadPage();
   const { document } = dom.window;

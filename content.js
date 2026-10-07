@@ -23,8 +23,23 @@
   const NO_CHANGES_RE = /no changes/i;
   const CANDIDATE_TEXT_RE = /Terraform plan|(?:HCP Terraform|Terraform Cloud)\//;
 
+  // Semantic/stable-ish boundaries around GitHub's CI status-check UI. The
+  // text scan must stay inside these regions so PR descriptions and comments
+  // that mention Terraform plans are never rewritten.
+  const CHECK_REGION_SELECTORS = [
+    "#partial-pull-merging",
+    "[data-testid*='check']",
+    "[aria-label*='check' i]",
+    "[class*='MergeBox']",
+    "[class*='mergeability']",
+    "[class*='StatusCheck']",
+    "[class*='status-check']",
+  ];
+  const CHECK_REGION_SELECTOR = CHECK_REGION_SELECTORS.join(",");
+
   // Known containers for check titles in past/current GitHub layouts. These
-  // are only cheap hints; the text-node scan below is the primary detection.
+  // are only cheap hints within a confirmed check region; the text-node scan
+  // below remains the primary detection.
   const KNOWN_SELECTORS = [
     "div.TimelineItem strong",
     "span[class*='titleDescription']",
@@ -233,29 +248,41 @@
 
   function collectCandidates() {
     const candidates = new Set();
+    const regions = Array.from(
+      document.querySelectorAll(CHECK_REGION_SELECTOR)
+    ).filter(
+      (region) =>
+        !region.parentElement ||
+        !region.parentElement.closest(CHECK_REGION_SELECTOR)
+    );
 
     // Known layouts first: these containers may hold both the check-title
     // link and the plan description, giving the best formatting result.
-    for (const selector of KNOWN_SELECTORS) {
-      for (const el of document.querySelectorAll(selector)) {
-        if (CANDIDATE_TEXT_RE.test(el.textContent || "")) {
-          candidates.add(el);
+    for (const region of regions) {
+      for (const selector of KNOWN_SELECTORS) {
+        for (const el of region.querySelectorAll(selector)) {
+          if (CANDIDATE_TEXT_RE.test(el.textContent || "")) {
+            candidates.add(el);
+          }
         }
       }
-    }
 
-    // Selector-independent fallback: any text node mentioning a Terraform
-    // plan or a provider path, wherever GitHub happens to render it.
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-      acceptNode: (node) =>
-        !isSkippedTextNode(node) && CANDIDATE_TEXT_RE.test(node.data)
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_REJECT,
-    });
-    while (walker.nextNode()) {
-      const parent = walker.currentNode.parentElement;
-      if (!parent || parent.closest(`.${RESULT_CLASS}`)) continue;
-      candidates.add(containerFor(parent));
+      // Selector-independent fallback within CI UI only.
+      const walker = document.createTreeWalker(
+        region,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node) =>
+            !isSkippedTextNode(node) && CANDIDATE_TEXT_RE.test(node.data)
+              ? NodeFilter.FILTER_ACCEPT
+              : NodeFilter.FILTER_REJECT,
+        }
+      );
+      while (walker.nextNode()) {
+        const parent = walker.currentNode.parentElement;
+        if (!parent || parent.closest(`.${RESULT_CLASS}`)) continue;
+        candidates.add(containerFor(parent));
+      }
     }
 
     return candidates;
