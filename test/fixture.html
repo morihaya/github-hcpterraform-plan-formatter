@@ -7,6 +7,12 @@
 <body>
   <h1>HCP Terraform Plan Formatter fixtures</h1>
 
+  <!-- PR description: Terraform-like text outside CI must stay untouched -->
+  <article id="pr-description">
+    HCP Terraform plan: 7 to add, 8 to change, 9 to destroy
+  </article>
+
+  <section aria-label="Status checks">
   <!-- Case 1: legacy TimelineItem layout, everything inside one <strong> -->
   <div class="TimelineItem" id="case1">
     <strong>
@@ -39,5 +45,6 @@
 
   <!-- Case 7: embedded JSON payload (like GitHub's react data) must stay untouched -->
   <script type="application/json" id="embedded-data">{"check":"HCP Terraform/my-org/ws-embedded — Terraform plan: 9 to add, 9 to change, 9 to destroy"}</script>
+  </section>
 </body>
 </html>
