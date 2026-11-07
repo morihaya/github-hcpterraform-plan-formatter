@@ -77,8 +77,6 @@ GitHubのPull Requestページで表示されるHCP Terraform（旧Terraform Clo
 ```json
 {
   "manifest_version": 3,
-  "permissions": ["activeTab", "tabs"],
-  "host_permissions": ["*://github.com/*"],
   "content_scripts": [{
     "matches": ["*://github.com/*"],
     "js": ["content.js"],
@@ -103,17 +101,9 @@ GitHubのPull Requestページで表示されるHCP Terraform（旧Terraform Clo
 
 GitHubのPull Requestページに表示されるHCP Terraform / Terraform Cloudのチェック結果を読みやすく整形するための拡張機能です。長い組織名プレフィックスを省略し、Terraform planのadd/change/destroy件数を見やすく表示します。
 
-### activeTab の正当化理由
+### Site access justification
 
-ユーザーが開いているGitHub Pull Requestページ上で、表示中のHCP Terraform / Terraform Cloudチェック結果を整形するために使用します。対象はユーザーが操作中のタブに限定されます。
-
-### tabs の正当化理由
-
-GitHubのSPA遷移やタブ更新時に、拡張機能のバッジ表示を適切に更新・リセットするために使用します。閲覧内容の収集や外部送信には使用しません。
-
-### Host permission justification
-
-The extension needs access to github.com so it can run on GitHub Pull Request pages and continue working after GitHub single-page app navigation. Formatting logic only runs on Pull Request pages and only modifies visible HCP Terraform / Terraform Cloud check result text.
+The content script is limited to github.com through `content_scripts.matches` so it can run on GitHub Pull Request pages and continue working after GitHub single-page app navigation. Formatting logic only runs on Pull Request pages and only modifies visible HCP Terraform / Terraform Cloud check result text.
 
 ### リモートコード
 

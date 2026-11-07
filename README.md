@@ -96,7 +96,7 @@ Terraform plan: 1 to add, 0 to change, 1 to destroy
 ## 🔧 Technical Specifications
 
 - **Manifest Version**: 3 (latest Chrome extension standard)
-- **Permissions**: `activeTab`, `tabs`, `*://github.com/*`
+- **Site access**: Content script runs on `*://github.com/*` via `content_scripts.matches`
 - **Service Worker**: Background script for badge management
 - **Execution**: `document_idle` for optimal performance
 - **Compatibility**: GitHub SPA navigation, MutationObserver
